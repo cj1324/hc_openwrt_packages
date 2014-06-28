@@ -22,7 +22,7 @@ define Package/shadowsocks-libev/Default
   CATEGORY:=Network
   TITLE:=Lightweight Secured Socks5 Proxy via ss-redir and ss-tunnel
   URL:=https://github.com/madeye/shadowsocks-libev
-  DEPENDS:= +kmod-ipt-ipset +iptables-mod-nat-extra
+  DEPENDS:= +kmod-ipt-ipset +iptables-mod-nat-extra +ipset
 endef
 
 define Package/shadowsocks-libev
