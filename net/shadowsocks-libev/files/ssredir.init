@@ -1,0 +1,112 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006-2011 OpenWrt.org
+
+START=98
+STOP=98
+
+SERVICE_WRITE_PID=1
+SERVICE_PID_FILE="/var/run/ssredir.pid"
+SERVICE_BIN="/usr/bin/ssredir"
+
+ARGS=
+
+BASE_IPTABLES="iptables -t nat "
+TEMP_RULE_FILE="/var/etc/ssredir_iptables"
+
+
+type_ssredir_name=
+type_iptables_name=
+
+target_port=
+chain_name=
+chain_commet=
+udprelay=
+
+start() {
+    config_load "ssredir"
+    parse_args "${type_ssredir_name}"
+    parse_iptables "${type_iptables_name}" "${type_ssredir_name}"
+    . ${TEMP_RULE_FILE}
+    service_start ${SERVICE_BIN} ${ARGS} -f ${SERVICE_PID_FILE}
+}
+
+stop() {
+
+    config_load "ssredir"
+    parse_args "${type_ssredir_name}"
+    parse_iptables "${type_iptables_name}" "${type_ssredir_name}"
+    clean_rules
+    service_stop ${SERVICE_BIN}
+}
+config_cb() {
+    local cfgtype="$1"
+    local cfgname="$2"
+
+    if [ "${cfgtype}" == "ssredir" ]; then
+        type_ssredir_name="${cfgname}"
+    fi
+
+    if [ "${cfgtype}" == "iptables" ]; then
+        type_iptables_name="${cfgname}"
+    fi
+}
+
+
+clean_rules(){
+    echo "" >${TEMP_RULE_FILE}
+    # TODO join remove
+    ${BASE_IPTABLES} -F ${chain_name}
+    ${BASE_IPTABLES} -X ${chain_name}
+}
+
+
+
+parse_args() {
+   local cfgname="$1" 
+   config_list_foreach "${cfgname}" server handle_redir_server
+   local sport
+   config_get sport "${cfgname}" sport
+   local lport
+   config_get lport "${cfgname}" lport
+   local method
+   config_get method "${cfgname}" method
+   local passwd
+   config_get passwd "${cfgname}" passwd
+   local timeout
+   config_get timeout "${cfgname}" timeout
+
+   target_port=${lport}
+   ARGS="${ARGS} -p ${sport} -m ${method} -k ${passwd} -l ${lport} -t ${timeout}"
+}
+
+handle_redir_server() {
+    local value="$1"
+    ARGS="${ARGS} -s ${value} "
+}
+
+
+parse_iptables() {
+    local cfgname="$1"
+    local ssredir_cfgname="$2"
+
+    local chain
+    config_get chain "${cfgname}" chain
+    chain_name=${chain}
+
+    echo "#!/bin/sh" >${TEMP_RULE_FILE}
+    echo "${BASE_IPTABLES} -N ${chain}" >>${TEMP_RULE_FILE}
+    config_list_foreach "${ssredir_cfgname}" server handle_redir_return
+    config_list_foreach "${cfgname}" ignore handle_redir_return
+    config_list_foreach "${cfgname}" ipset handle_redir_join
+    chmod u+x ${TEMP_RULE_FILE}
+}
+
+handle_redir_return() {
+    local value="$1"
+    echo "${BASE_IPTABLES} -A ${chain_name} -d ${value} -j RETURN">>${TEMP_RULE_FILE}
+}
+
+handle_redir_join() {
+    #echo "${BASE_IPTABLES} -A prerouting_rule -j ${chain_name} " >>${TEMP_RULE_FILE}
+    #TODO ipset redir
+}
