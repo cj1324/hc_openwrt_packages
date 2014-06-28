@@ -10,11 +10,11 @@ SERVICE_BIN="/usr/bin/sstunnel"
 
 
 ARGS=
-type_ssredir_name=
+cfg_name=
 
 start() {
     config_load "sstunnel"
-    parse_args "${type_ssredir_name}"
+    parse_args "${cfg_name}"
     service_start ${SERVICE_BIN} ${ARGS} -f ${SERVICE_PID_FILE}
 }
 
@@ -29,7 +29,7 @@ config_cb() {
     local cfgname="$2"
 
     if [ "${cfgtype}" == "sstunnel" ]; then
-        type_ssredir_name="${cfgname}"
+        cfg_name="${cfgname}"
     fi
 }
 

@@ -19,14 +19,13 @@ type_iptables_name=
 
 target_port=
 chain_name=
-chain_commet=
-udprelay=
+chain_comment=
 
 start() {
     config_load "ssredir"
     parse_args "${type_ssredir_name}"
     parse_iptables "${type_iptables_name}" "${type_ssredir_name}"
-    . ${TEMP_RULE_FILE}
+    . ${TEMP_RULE_FILE} # create
     service_start ${SERVICE_BIN} ${ARGS} -f ${SERVICE_PID_FILE}
 }
 
@@ -35,9 +34,11 @@ stop() {
     config_load "ssredir"
     parse_args "${type_ssredir_name}"
     parse_iptables "${type_iptables_name}" "${type_ssredir_name}"
-    clean_rules
+    clean_rules "${type_iptables_name}"
+    . ${TEMP_RULE_FILE}  # remove
     service_stop ${SERVICE_BIN}
 }
+
 config_cb() {
     local cfgtype="$1"
     local cfgname="$2"
@@ -54,9 +55,17 @@ config_cb() {
 
 clean_rules(){
     echo "" >${TEMP_RULE_FILE}
-    # TODO join remove
-    ${BASE_IPTABLES} -F ${chain_name}
-    ${BASE_IPTABLES} -X ${chain_name}
+    local cfgname=$1
+    config_list_foreach "${cfgname}" ipset handle_redir_clean
+    echo "${BASE_IPTABLES} -F ${chain_name}" >>${TEMP_RULE_FILE}
+    echo "${BASE_IPTABLES} -X ${chain_name}" >>${TEMP_RULE_FILE}
+    chmod u+x ${TEMP_RULE_FILE}
+}
+
+handle_redir_clean(){
+    local value=$1
+    echo "${BASE_IPTABLES} -D prerouting_rule -p tcp -m set --match-set ${value} dst -j ${chain_name} -m comment --comment \"${chain_comment}\" " >>${TEMP_RULE_FILE}
+    echo "ipset destroy ${value}" >>${TEMP_RULE_FILE}
 }
 
 
@@ -92,11 +101,17 @@ parse_iptables() {
     local chain
     config_get chain "${cfgname}" chain
     chain_name=${chain}
+    local comment
+    config_get comment "${cfgname}" comment
+    chain_comment=${comment}
 
     echo "#!/bin/sh" >${TEMP_RULE_FILE}
     echo "${BASE_IPTABLES} -N ${chain}" >>${TEMP_RULE_FILE}
     config_list_foreach "${ssredir_cfgname}" server handle_redir_return
     config_list_foreach "${cfgname}" ignore handle_redir_return
+
+    echo "${BASE_IPTABLES} -A ${chain} -p tcp -m comment --comment \"${chain_comment}\" -j REDIRECT --to-ports ${target_port}" >>${TEMP_RULE_FILE}
+
     config_list_foreach "${cfgname}" ipset handle_redir_join
     chmod u+x ${TEMP_RULE_FILE}
 }
@@ -106,7 +121,9 @@ handle_redir_return() {
     echo "${BASE_IPTABLES} -A ${chain_name} -d ${value} -j RETURN">>${TEMP_RULE_FILE}
 }
 
+
 handle_redir_join() {
-    #echo "${BASE_IPTABLES} -A prerouting_rule -j ${chain_name} " >>${TEMP_RULE_FILE}
-    #TODO ipset redir
+    local value=$1
+    echo "ipset -N ${value} iphash" >>${TEMP_RULE_FILE}
+    echo "${BASE_IPTABLES} -A prerouting_rule -p tcp -m set --match-set ${value} dst -j ${chain_name} -m comment --comment \"${chain_comment}\" " >>${TEMP_RULE_FILE}
 }
