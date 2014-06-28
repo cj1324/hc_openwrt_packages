@@ -25,54 +25,32 @@ PKG_BUILD_PARALLEL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/dnsmasq/Default
+
+define Package/dnsmasq-ipset
   SECTION:=net
   CATEGORY:=Base system
-  TITLE:=DNS and DHCP server
+  TITLE:=DNS and DHCP server (with IPSET support) [h]
   URL:=http://www.thekelleys.org.uk/dnsmasq/
 endef
 
-define Package/dnsmasq
-$(call Package/dnsmasq/Default)
-  VARIANT:=nodhcpv6
-endef
-
-define Package/dnsmasq-ipset
-$(call Package/dnsmasq/Default)
-  TITLE += (with IPSET support) [h]
-  VARIANT:=ipset
-endef
-
-define Package/dnsmasq/description
-  It is intended to provide coupled DNS and DHCP service to a LAN.
-endef
-
 define Package/dnsmasq-ipset/description
-$(call Package/dnsmasq/description)
-
-This is a variant with IPSET support
+  It is intended to provide coupled DNS and DHCP service to a LAN.
+  This is a variant with IPSET support
 endef
 
 
-define Package/dnsmasq/conffiles
+define Package/dnsmasq-ipset/conffiles
 /etc/config/dhcp
 /etc/dnsmasq.conf
 endef
 
-Package/dnsmasq-ipset/conffiles = $(Package/dnsmasq/conffiles)
 
 TARGET_CFLAGS += -ffunction-sections -fdata-sections
 TARGET_LDFLAGS += -Wl,--gc-sections
 
 COPTS = $(if $(CONFIG_IPV6),,-DNO_IPV6)
+COPTS += -DNO_AUTH -DNO_DHCP6
 
-
-
-ifeq ($(BUILD_VARIANT),ipset)
-	COPTS += -DNO_AUTH -DNO_DHCP6
-else
-	COPTS += -DNO_AUTH -DNO_DHCP6 -DNO_IPSET
-endif
 
 MAKE_FLAGS := \
 	$(TARGET_CONFIGURE_OPTS) \
@@ -81,7 +59,7 @@ MAKE_FLAGS := \
 	COPTS="$(COPTS)" \
 	PREFIX="/usr"
 
-define Package/dnsmasq/install
+define Package/dnsmasq-ipset/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(CP) $(PKG_INSTALL_DIR)/usr/sbin/dnsmasq $(1)/usr/sbin/
 	$(INSTALL_DIR) $(1)/etc/config
@@ -93,8 +71,6 @@ define Package/dnsmasq/install
 	$(INSTALL_DATA) ./files/dnsmasq.hotplug $(1)/etc/hotplug.d/iface/25-dnsmasq
 endef
 
-Package/dnsmasq-ipset/install = $(Package/dnsmasq/install)
 
 
-# $(eval $(call BuildPackage,dnsmasq))
 $(eval $(call BuildPackage,dnsmasq-ipset))
