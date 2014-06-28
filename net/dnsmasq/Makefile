@@ -7,11 +7,11 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=dnsmasq
+PKG_NAME:=dnsmasq-ipset
 PKG_VERSION:=2.71
 PKG_RELEASE:=3
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE:=dnsmasq-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://thekelleys.org.uk/dnsmasq
 PKG_MD5SUM:=15a68f7f6cc0119e843f67d2f79598f1
 
