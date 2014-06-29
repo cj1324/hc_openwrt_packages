@@ -3,3 +3,4 @@
 [ "$ACTION" = ifup ] || exit 0
 
 /etc/init.d/ssredir enabled && /etc/init.d/ssredir start
+/etc/init.d/firewall enabled && fw3 -q restart
