@@ -62,6 +62,8 @@ define Package/shadowsocks-libev/install
 	$(INSTALL_BIN) ./files/ssredir.init $(1)/etc/init.d/ssredir
 	$(INSTALL_CONF) ./files/sstunnel.conf $(1)/etc/config/sstunnel
 	$(INSTALL_CONF) ./files/ssredir.conf $(1)/etc/config/ssredir
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
+	$(INSTALL_DATA) ./files/ssredir.hotplug $(1)/etc/hotplug.d/iface/05-ssredir
 endef
 
 Package/shadowsocks-libev-polarssl/install=$(Package/shadowsocks-libev/install)

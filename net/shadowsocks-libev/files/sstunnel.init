@@ -19,9 +19,13 @@ start() {
 }
 
 stop() {
-
     config_load "sstunnel"
     service_stop ${SERVICE_BIN}
+}
+
+boot() {
+    # Need to manually
+    return 0
 }
 
 config_cb() {

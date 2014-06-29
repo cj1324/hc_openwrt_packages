@@ -11,8 +11,8 @@ SERVICE_BIN="/usr/bin/ssredir"
 ARGS=
 
 BASE_IPTABLES="iptables -t nat "
-TEMP_RULE_FILE="/var/etc/ssredir_iptables"
 
+FIREWALL_USER_RULE="/var/etc/ssredir.firewall.user"
 
 type_ssredir_name=
 type_iptables_name=
@@ -25,7 +25,6 @@ start() {
     config_load "ssredir"
     parse_args "${type_ssredir_name}"
     parse_iptables "${type_iptables_name}" "${type_ssredir_name}"
-    . ${TEMP_RULE_FILE} # create
     service_start ${SERVICE_BIN} ${ARGS} -f ${SERVICE_PID_FILE}
 }
 
@@ -33,10 +32,20 @@ stop() {
 
     config_load "ssredir"
     parse_args "${type_ssredir_name}"
-    parse_iptables "${type_iptables_name}" "${type_ssredir_name}"
-    clean_rules "${type_iptables_name}"
-    . ${TEMP_RULE_FILE}  # remove
+    echo "">${FIREWALL_USER_RULE}
+    local finc=""
+    finc=$(uci get firewall.@include[-1].path 2>/dev/null)
+    [ ${finc}x = ${FIREWALL_USER_RULE}x ] && {
+      uci delete firewall.@include[-1];
+      uci commit firewall;
+      echo "Please restart the firewall";
+    }
     service_stop ${SERVICE_BIN}
+}
+
+boot() {
+    # Will be launched through hotplug
+    return 0
 }
 
 config_cb() {
@@ -51,24 +60,6 @@ config_cb() {
         type_iptables_name="${cfgname}"
     fi
 }
-
-
-clean_rules(){
-    echo "" >${TEMP_RULE_FILE}
-    local cfgname=$1
-    config_list_foreach "${cfgname}" ipset handle_redir_clean
-    echo "${BASE_IPTABLES} -F ${chain_name}" >>${TEMP_RULE_FILE}
-    echo "${BASE_IPTABLES} -X ${chain_name}" >>${TEMP_RULE_FILE}
-    chmod u+x ${TEMP_RULE_FILE}
-}
-
-handle_redir_clean(){
-    local value=$1
-    echo "${BASE_IPTABLES} -D prerouting_rule -p tcp -m set --match-set ${value} dst -j ${chain_name} -m comment --comment \"${chain_comment}\" " >>${TEMP_RULE_FILE}
-    echo "ipset destroy ${value}" >>${TEMP_RULE_FILE}
-}
-
-
 
 parse_args() {
    local cfgname="$1" 
@@ -105,25 +96,33 @@ parse_iptables() {
     config_get comment "${cfgname}" comment
     chain_comment=${comment}
 
-    echo "#!/bin/sh" >${TEMP_RULE_FILE}
-    echo "${BASE_IPTABLES} -N ${chain}" >>${TEMP_RULE_FILE}
+    local finc=""
+    finc=$(uci get firewall.@include[-1].path 2>/dev/null)
+    [ ${finc}x = ${FIREWALL_USER_RULE}x ] || {
+      uci add firewall include 2>&1 >/dev/null
+      uci set firewall.@include[-1].path=${FIREWALL_USER_RULE}
+      uci commit firewall
+      echo "Please restart the firewall";
+    }
+    echo "">${FIREWALL_USER_RULE}
+    echo "[ \$(${BASE_IPTABLES} -L ${chain} 2>/dev/null |wc -l) -eq 0 ] || { exit 1; }" >>${FIREWALL_USER_RULE}
+    echo "${BASE_IPTABLES} -N ${chain}" >>${FIREWALL_USER_RULE}
     config_list_foreach "${ssredir_cfgname}" server handle_redir_return
     config_list_foreach "${cfgname}" ignore handle_redir_return
 
-    echo "${BASE_IPTABLES} -A ${chain} -p tcp -m comment --comment \"${chain_comment}\" -j REDIRECT --to-ports ${target_port}" >>${TEMP_RULE_FILE}
+    echo "${BASE_IPTABLES} -A ${chain} -p tcp -m comment --comment \"${chain_comment}\" -j REDIRECT --to-ports ${target_port}" >>${FIREWALL_USER_RULE}
 
     config_list_foreach "${cfgname}" ipset handle_redir_join
-    chmod u+x ${TEMP_RULE_FILE}
 }
 
 handle_redir_return() {
     local value="$1"
-    echo "${BASE_IPTABLES} -A ${chain_name} -d ${value} -j RETURN">>${TEMP_RULE_FILE}
+    echo "${BASE_IPTABLES} -A ${chain_name} -d ${value} -j RETURN">>${FIREWALL_USER_RULE}
 }
 
 
 handle_redir_join() {
     local value=$1
-    echo "ipset -N ${value} iphash" >>${TEMP_RULE_FILE}
-    echo "${BASE_IPTABLES} -A prerouting_rule -p tcp -m set --match-set ${value} dst -j ${chain_name} -m comment --comment \"${chain_comment}\" " >>${TEMP_RULE_FILE}
+    echo "[ \$(ipset list ${value} 2>/dev/null| wc -l) -eq 0 ] && { ipset -N ${value} iphash; }" >>${FIREWALL_USER_RULE}
+    echo "${BASE_IPTABLES} -A prerouting_lan_rule -p tcp -m set --match-set ${value} dst -j ${chain_name} -m comment --comment \"${chain_comment}\" " >>${FIREWALL_USER_RULE}
 }
