@@ -20,7 +20,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/shadowsocks-libev/Default
   SECTION:=net
   CATEGORY:=Network
-  TITLE:=Lightweight Secured Socks5 Proxy via ss-redir and ss-tunnel
+  TITLE:=Lightweight Secured Socks5 Proxy via ss-redir
   URL:=https://github.com/madeye/shadowsocks-libev
   DEPENDS:= +kmod-ipt-ipset +iptables-mod-nat-extra +ipset
 endef
@@ -46,7 +46,6 @@ endef
 Package/shadowsocks-libev-polarssl/description=$(Package/shadowsocks-libev/description)
 
 define Package/shadowsocks-libev/conffiles
-/etc/config/sstunnel.conf
 /etc/config/ssredir.conf
 endef
 
@@ -56,11 +55,8 @@ endif
 
 define Package/shadowsocks-libev/install
 	$(INSTALL_DIR) $(1)/usr/bin $(1)/etc/init.d $(1)/etc/config
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ss-tunnel $(1)/usr/bin/sstunnel
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ss-redir $(1)/usr/bin/ssredir
-	$(INSTALL_BIN) ./files/sstunnel.init $(1)/etc/init.d/sstunnel
 	$(INSTALL_BIN) ./files/ssredir.init $(1)/etc/init.d/ssredir
-	$(INSTALL_CONF) ./files/sstunnel.conf $(1)/etc/config/sstunnel
 	$(INSTALL_CONF) ./files/ssredir.conf $(1)/etc/config/ssredir
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
 	$(INSTALL_DATA) ./files/ssredir.hotplug $(1)/etc/hotplug.d/iface/30-ssredir
