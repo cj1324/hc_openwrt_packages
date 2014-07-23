@@ -88,9 +88,9 @@ append_ipset() {
 	xappend "--ipset=$1"
 }
 
-append_fqdomain() {
-	xappend "--server=/$1/$FQDNS"
-	xappend "--ipset=/$1/$FQIPSET"
+append_walldomain() {
+	xappend "--server=/$1/$WALLDNS"
+	xappend "--ipset=/$1/$WALLIPSET"
 }
 append_address() {
 	xappend "--address=$1"
@@ -117,8 +117,8 @@ append_bogusnxdomain() {
 dnsmasq() {
 	local cfg="$1"
 
-	config_get FQDNS "$cfg" fqdns
-	config_get FQIPSET "$cfg" fqipset
+	config_get WALLDNS "$cfg" walldns
+	config_get WALLIPSET "$cfg" wallipset
 
 	append_bool "$cfg" authoritative "--dhcp-authoritative"
 	append_bool "$cfg" nodaemon "--no-daemon"
@@ -150,7 +150,7 @@ dnsmasq() {
 	append_parm "$cfg" "local" "--server"
 	config_list_foreach "$cfg" "server" append_server
 	config_list_foreach "$cfg" "ipset" append_ipset
-	config_list_foreach "$cfg" "fqdomain" append_fqdomain
+	config_list_foreach "$cfg" "walldomain" append_walldomain
 	config_list_foreach "$cfg" "address" append_address
 	config_list_foreach "$cfg" "interface" append_interface
 	config_list_foreach "$cfg" "notinterface" append_notinterface
