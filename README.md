@@ -6,12 +6,18 @@ Developers simply use
 
 ``
 cp ./feeds.conf.default  ./feeds.conf
-echo "src-git packages https://github.com/openwrt/packages.git" >>./feeds.conf
+
+echo "src-git hc_packages https://github.com/cj1324/hc_openwrt_packages.git" >>./feeds.conf
+
 ./scripts/feeds update -a
+
 ./scripts/feeds install -a
+
 make menuconfig
+
 make -j2
 ``
+
 [Official Documents](http://wiki.openwrt.org/doc/devel/feeds "Official Documents")
 
 Feed Features
