@@ -28,6 +28,7 @@ Package List
 + net
 
   + axel
+  + chinadns-c
   + dnsmasq-ipset `*`
   + iptraf
   + shadowsocks-libev `*`
