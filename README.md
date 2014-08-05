@@ -1,5 +1,5 @@
-New OpenWrt Feeds
-=================
+Customized OpenWRT Feed
+=======================
 
 Developers simply use
 ---------------------
@@ -15,8 +15,8 @@ make -j2
 
 [Official Documents](http://wiki.openwrt.org/doc/devel/feeds "Official Documents")
 
-Feed Features
--------------
+Features
+--------
 
 + Additions and improvements shadowsocks-libev (Improved compatibility with firewall rules)
 + Custom ipset version dnsmasq (Does not include ipv6, DNSSEC)
