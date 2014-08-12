@@ -1,0 +1,19 @@
+#!/bin/sh /etc/rc.common
+# chinadns init script
+
+START=90
+STOP=15
+
+SERVICE_BIN="/usr/bin/chinadns"
+SERVICE_PID_FILE="/var/run/chinadns.pid"
+ARGS=
+
+start()
+{
+    service_start ${SERVICE_BIN} ${ARGS} -f ${SERVICE_PID_FILE}
+}
+
+stop()
+{
+    service_stop ${SERVICE_BIN}
+}
