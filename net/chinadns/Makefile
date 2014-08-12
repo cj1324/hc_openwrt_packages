@@ -22,10 +22,11 @@ define Package/ChinaDNS-OpenWRT/Default
   CATEGORY:=Network
   TITLE:=ChinaDNS-OpenWRT
   URL:=https://github.com/cj1324/ChinaDNS-OpenWRT
+  DEPENDS:=+libuci
 endef
 
 define Package/ChinaDNS-OpenWRT
-  $(call Package/ChinaDNS-C/Default)
+  $(call Package/ChinaDNS-OpenWRT/Default)
 endef
 
 define Package/ChinaDNS-OpenWRT/description
