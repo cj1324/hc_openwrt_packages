@@ -6,7 +6,9 @@ PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/cj1324/ChinaDNS-OpenWRT.git
-PKG_SOURCE_VERSION:=ee6f0f837bf7b2e1b406ddc3ce5df539fd8a2711
+PKG_SOURCE_VERSION:=626f492d2062bcaa0b7f28c570a463f394de812e
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 
 PKG_MAINTAINER:=clowwindy <clowwindy42@gmail.com>
 
@@ -30,26 +32,26 @@ define Package/ChinaDNS-OpenWRT
 endef
 
 define Package/ChinaDNS-OpenWRT/description
-A DNS forwarder that ignores incorrect(you knew it) responses.
+A DNS forwarder that ignores incorrect(you knew it) responses. (without chnroute)
 endef
 
 CMAKE_OPTIONS = \
      -DCMAKE_INSTALL_PREFIX=/usr \
-     -DWITH_DEBUG=OFF \
+     -DWITH_UCI:BOOL=ON \
+     -DWITH_CHN_ROUTE:BOOL=OFF \
+     -DWITH_DEBUG:BOOL=OFF \
 
 define Package/ChinaDNS-OpenWRT/conffiles
-/etc/chinadns_iplist.txt
 /etc/config/chinadns
 endef
 
 define Package/ChinaDNS-OpenWRT/install
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/chinadns $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_CONF) ../iplist.txt $(1)/etc/chinadns_iplist.txt
 	$(INSTALL_BIN) ./files/chinadns.init $(1)/etc/init.d/chinadns
 	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_BIN) ../chinadns.conf $(1)/etc/config/chinadns
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/chinadns $(1)/usr/bin
+	$(INSTALL_CONF) ./files/chinadns.conf $(1)/etc/config/chinadns
 endef
 
 $(eval $(call BuildPackage,ChinaDNS-OpenWRT))

@@ -5,12 +5,12 @@ START=90
 STOP=15
 
 SERVICE_BIN="/usr/bin/chinadns"
-SERVICE_PID_FILE="/var/run/chinadns.pid"
-ARGS=
+SERVICE_WRITE_PID="1"
+SERVICE_DAEMONIZE="1"
 
 start()
 {
-    service_start ${SERVICE_BIN} ${ARGS} -f ${SERVICE_PID_FILE}
+    service_start ${SERVICE_BIN}
 }
 
 stop()
