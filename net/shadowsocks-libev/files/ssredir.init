@@ -23,6 +23,7 @@ chain_comment=
 
 start() {
     config_load "ssredir"
+    ARGS=
     parse_args "${type_ssredir_name}"
     parse_iptables "${type_iptables_name}" "${type_ssredir_name}"
     service_start ${SERVICE_BIN} ${ARGS} -f ${SERVICE_PID_FILE}
