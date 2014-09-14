@@ -35,10 +35,6 @@ Package List
   + shadowsocks-libev `^`
   + socat
 
-+ devel
-
-  + diffutils
-
 + utils
 
   + mksh
