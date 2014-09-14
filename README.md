@@ -33,7 +33,6 @@ Package List
   + dnsmasq-ipset `^`
   + iptraf
   + shadowsocks-libev `^`
-  + socat
 
 + utils
 
