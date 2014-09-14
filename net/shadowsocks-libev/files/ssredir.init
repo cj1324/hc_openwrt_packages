@@ -23,7 +23,6 @@ chain_comment=
 
 start() {
     config_load "ssredir"
-    ARGS=
     parse_args "${type_ssredir_name}"
     parse_iptables "${type_iptables_name}" "${type_ssredir_name}"
     service_start ${SERVICE_BIN} ${ARGS} -f ${SERVICE_PID_FILE}
@@ -34,6 +33,7 @@ stop() {
     config_load "ssredir"
     parse_args "${type_ssredir_name}"
     echo "">${FIREWALL_USER_RULE}
+    ARGS=
     local finc=""
     finc=$(uci get firewall.@include[-1].path 2>/dev/null)
     [ ${finc}x = ${FIREWALL_USER_RULE}x ] && {
