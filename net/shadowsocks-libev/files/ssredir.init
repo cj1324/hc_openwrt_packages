@@ -67,6 +67,8 @@ parse_args() {
    config_list_foreach "${cfgname}" server handle_redir_server
    local sport
    config_get sport "${cfgname}" sport
+   local laddr
+   config_get laddr "${cfgname}" laddr
    local lport
    config_get lport "${cfgname}" lport
    local method
@@ -76,8 +78,14 @@ parse_args() {
    local timeout
    config_get timeout "${cfgname}" timeout
 
+   local fastopen
+   config_get_bool fastopen "${cfgname}"  fastopen
+
    target_port=${lport}
-   ARGS="${ARGS} -p ${sport} -m ${method} -k ${passwd} -l ${lport} -t ${timeout}"
+   ARGS="${ARGS} -p ${sport} -m ${method} -k ${passwd} -b ${laddr} -l ${lport} -t ${timeout}"
+   if [ fastopen = "1" ];then
+       ARGS="${ARGS} --fast-open "
+   fi
 }
 
 handle_redir_server() {
