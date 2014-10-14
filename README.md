@@ -36,7 +36,6 @@ Package List
 
 + utils
 
-  + mksh
   + procps
   + vim
 
