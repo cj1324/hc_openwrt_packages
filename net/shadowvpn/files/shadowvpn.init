@@ -1,0 +1,22 @@
+#!/bin/sh /etc/rc.common
+# chinadns init script
+
+START=90
+STOP=15
+
+SERVICE_BIN="/usr/bin/shadowvpn"
+SERVICE_WRITE_PID="1"
+SERVICE_DAEMONIZE="1"
+
+CONFIGFILE="/var/run/shadowvpn.conf"
+
+start()
+{
+    # TODO Generate configuration
+    service_start ${SERVICE_BIN} -c ${CONFIGFILE}
+}
+
+stop()
+{
+    service_stop ${SERVICE_BIN}
+}

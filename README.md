@@ -33,6 +33,7 @@ Package List
   + dnsmasq-ipset `^`
   + iptraf
   + shadowsocks-libev `^`
+  + shadowvpn `^`
 
 + utils
 
