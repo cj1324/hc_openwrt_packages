@@ -6,7 +6,7 @@ PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/cj1324/ShadowVPN.git
-PKG_SOURCE_VERSION:=6c66adb7486252f97e342578aa4d8244b9736ccb
+PKG_SOURCE_VERSION:=1cb051f2f386a968322b640e9c08cbefa2116fbb
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 
@@ -22,9 +22,10 @@ include $(INCLUDE_DIR)/cmake.mk
 define Package/ShadowVPN
   SECTION:=net
   CATEGORY:=Network
+  SUBMENU:=VPN
   TITLE:=ShadowVPN
   URL:=https://github.com/cj1324/ChinaDNS-OpenWRT
-  DEPENDS:=+libsodium
+  DEPENDS:=+libsodium +kmod-tun
 endef
 
 
@@ -33,8 +34,7 @@ ShadowVPN is a fast, safe VPN based on libsodium. Designed for low end devices
 endef
 
 CMAKE_OPTIONS = \
-     -DCMAKE_INSTALL_PREFIX=/usr \
-     -DWITH_DEBUG:BOOL=OFF
+     -DCMAKE_INSTALL_PREFIX=/usr
 
 define Package/ShadowVPN/conffiles
 /etc/config/shadowvpn
