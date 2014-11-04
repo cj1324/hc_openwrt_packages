@@ -1,6 +1,6 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=ChinaDNS-OpenWRT
+PKG_NAME:=ChinaDNS
 PKG_VERSION:=1.1.5
 PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
@@ -21,19 +21,19 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
 
 
-define Package/ChinaDNS-OpenWRT/Default
+define Package/ChinaDNS/Default
   SECTION:=net
   CATEGORY:=Network
-  TITLE:=ChinaDNS-OpenWRT
+  TITLE:=ChinaDNS
   URL:=https://github.com/cj1324/ChinaDNS-OpenWRT
   DEPENDS:=+libuci
 endef
 
-define Package/ChinaDNS-OpenWRT
-  $(call Package/ChinaDNS-OpenWRT/Default)
+define Package/ChinaDNS
+  $(call Package/ChinaDNS/Default)
 endef
 
-define Package/ChinaDNS-OpenWRT/description
+define Package/ChinaDNS/description
 A DNS forwarder that ignores incorrect(you knew it) responses. (without chnroute)
 endef
 
@@ -43,11 +43,11 @@ CMAKE_OPTIONS = \
      -DWITH_CHN_ROUTE:BOOL=OFF \
      -DWITH_DEBUG:BOOL=OFF \
 
-define Package/ChinaDNS-OpenWRT/conffiles
+define Package/ChinaDNS/conffiles
 /etc/config/chinadns
 endef
 
-define Package/ChinaDNS-OpenWRT/install
+define Package/ChinaDNS/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/chinadns $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/etc/init.d
@@ -56,4 +56,4 @@ define Package/ChinaDNS-OpenWRT/install
 	$(INSTALL_CONF) ./files/chinadns.conf $(1)/etc/config/chinadns
 endef
 
-$(eval $(call BuildPackage,ChinaDNS-OpenWRT))
+$(eval $(call BuildPackage,ChinaDNS))
