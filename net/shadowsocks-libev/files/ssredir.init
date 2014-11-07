@@ -63,7 +63,7 @@ config_cb() {
 }
 
 parse_args() {
-   local cfgname="$1" 
+   local cfgname="$1"
    config_list_foreach "${cfgname}" server handle_redir_server
    local sport
    config_get sport "${cfgname}" sport
@@ -82,15 +82,15 @@ parse_args() {
    config_get_bool fastopen "${cfgname}"  fastopen
 
    target_port=${lport}
-   ARGS+=" -p ${sport} -m ${method} -k ${passwd} -b ${laddr} -l ${lport} -t ${timeout}"
+   ARGS="${ARGS} -p ${sport} -m ${method} -k ${passwd} -b ${laddr} -l ${lport} -t ${timeout}"
    if [ ${fastopen} = "1" ];then
-       ARGS+=" --fast-open "
+       ARGS="${ARGS} --fast-open"
    fi
 }
 
 handle_redir_server() {
     local value="$1"
-    ARGS+=" -s ${value} "
+    ARGS="${ARGS} -s ${value}"
 }
 
 
