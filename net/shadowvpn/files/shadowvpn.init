@@ -8,13 +8,68 @@ SERVICE_BIN="/usr/bin/shadowvpn"
 SERVICE_WRITE_PID="1"
 SERVICE_DAEMONIZE="1"
 
-CONFIGFILE="/var/run/shadowvpn.conf"
+CONFIGFILE="/var/etc/shadowvpn.conf"
+
+shadowvpn_config(){
+    local cfg="$1"
+    echo -n "" >${CONFIGFILE}
+
+    local server
+    config_get server ${cfg} server
+    write_conf server ${server}
+
+    local port
+    config_get port ${cfg} port
+    write_conf port ${port}
+
+    local password
+    config_get password ${cfg} password
+    write_conf password ${password}
+
+    local mode
+    config_get mode ${cfg} mode
+    write_conf mode ${mode}
+
+    local intf
+    config_get intf ${cfg} intf
+    write_conf intf ${intf}
+
+    local mtu
+    config_get mtu ${cfg} mtu
+    write_conf mtu ${mtu}
+
+    local tun_local_ip
+    config_get tun_local_ip ${cfg} tun_local_ip
+    write_conf tun_local_ip ${tun_local_ip}
+
+    local tun_remote_ip
+    config_get tun_remote_ip ${cfg} tun_remote_ip
+    write_conf tun_remote_ip ${tun_remote_ip}
+
+    local tun_netmask
+    config_get tun_netmask ${cfg} tun_netmask
+    write_conf tun_netmask ${tun_netmask}
+
+    local pidfile
+    config_get pidfile ${cfg} pidfile
+    write_conf pidfile ${pidfile}
+
+    local logfile
+    config_get logfile ${cfg} logfile
+    write_conf logfile ${logfile}
+}
+
+write_conf(){
+    echo "${1}=${2}" >>${CONFIGFILE}
+}
 
 start()
 {
-    # TODO Generate configuration
+    config_load shadowvpn
+    config_foreach shadowvpn_config shadowvpn
     service_start ${SERVICE_BIN} -c ${CONFIGFILE}
 }
+
 
 stop()
 {
