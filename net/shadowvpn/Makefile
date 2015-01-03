@@ -21,28 +21,28 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
 
 
-define Package/ShadowVPN
+define Package/shadowvpn
   SECTION:=net
   CATEGORY:=Network
   SUBMENU:=VPN
   TITLE:=ShadowVPN
-  URL:=https://github.com/cj1324/ChinaDNS-OpenWRT
+  URL:=https://github.com/cj1324/ShadowVPN
   DEPENDS:=+!LIBSODIUM_MINIMAL:libsodium +kmod-tun +ip
 endef
 
 
-define Package/ShadowVPN/description
+define Package/shadowvpn/description
 ShadowVPN is a fast, safe VPN based on libsodium. Designed for low end devices
 endef
 
 CMAKE_OPTIONS = \
      -DCMAKE_INSTALL_PREFIX=/usr
 
-define Package/ShadowVPN/conffiles
+define Package/shadowvpn/conffiles
 /etc/config/shadowvpn
 endef
 
-define Package/ShadowVPN/install
+define Package/shadowvpn/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/shadowvpn $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/etc/init.d
@@ -51,4 +51,4 @@ define Package/ShadowVPN/install
 	$(INSTALL_CONF) ./files/shadowvpn.conf $(1)/etc/config/shadowvpn
 endef
 
-$(eval $(call BuildPackage,ShadowVPN))
+$(eval $(call BuildPackage,shadowvpn))
