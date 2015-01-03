@@ -33,7 +33,6 @@ stop() {
     config_load "ssredir"
     parse_args "${type_ssredir_name}"
     echo "">${FIREWALL_USER_RULE}
-    ARGS=
     local finc=""
     finc=$(uci get firewall.@include[-1].path 2>/dev/null)
     [ ${finc}x = ${FIREWALL_USER_RULE}x ] && {
@@ -41,6 +40,7 @@ stop() {
       uci commit firewall;
       echo "Please restart the firewall";
     }
+    ARGS=
     service_stop ${SERVICE_BIN}
 }
 
@@ -63,7 +63,7 @@ config_cb() {
 }
 
 parse_args() {
-   local cfgname="$1" 
+   local cfgname="$1"
    config_list_foreach "${cfgname}" server handle_redir_server
    local sport
    config_get sport "${cfgname}" sport
@@ -83,14 +83,14 @@ parse_args() {
 
    target_port=${lport}
    ARGS="${ARGS} -p ${sport} -m ${method} -k ${passwd} -b ${laddr} -l ${lport} -t ${timeout}"
-   if [ fastopen = "1" ];then
-       ARGS="${ARGS} --fast-open "
+   if [ ${fastopen} = "1" ];then
+       ARGS="${ARGS} --fast-open"
    fi
 }
 
 handle_redir_server() {
     local value="$1"
-    ARGS="${ARGS} -s ${value} "
+    ARGS="${ARGS} -s ${value}"
 }
 
 
