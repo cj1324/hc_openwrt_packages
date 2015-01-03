@@ -1,12 +1,12 @@
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=ShadowVPN
-PKG_VERSION:=0.1.3
+PKG_NAME:=shadowvpn
+PKG_VERSION:=0.1.6
 PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/cj1324/ShadowVPN.git
-PKG_SOURCE_VERSION:=17a6a0cc6c4c0f6169bffe882f39be89ef82f652
+PKG_SOURCE_VERSION:=4092250eb4ff664f6fe1f43eb6ddb30ddf824d44
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 
@@ -27,7 +27,7 @@ define Package/ShadowVPN
   SUBMENU:=VPN
   TITLE:=ShadowVPN
   URL:=https://github.com/cj1324/ChinaDNS-OpenWRT
-  DEPENDS:=+libsodium +kmod-tun
+  DEPENDS:=+!LIBSODIUM_MINIMAL:libsodium +kmod-tun +ip
 endef
 
 
