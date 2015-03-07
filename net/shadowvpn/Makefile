@@ -27,7 +27,7 @@ define Package/shadowvpn
   SUBMENU:=VPN
   TITLE:=ShadowVPN
   URL:=https://github.com/cj1324/ShadowVPN
-  DEPENDS:=+kmod-tun +ip
+  DEPENDS:=+kmod-tun +libsodium +ip
 endef
 
 
