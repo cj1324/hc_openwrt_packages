@@ -28,16 +28,9 @@ Package List
 
 + net
 
-  + axel
   + chinadns `^`
-  + dnsmasq-ipset `^`
   + iptraf
   + shadowsocks-libev `^`
   + shadowvpn `^`
-
-+ utils
-
-  + procps
-  + vim
 
 > Marked improvement project
